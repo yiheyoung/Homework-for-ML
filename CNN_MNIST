@@ -1,0 +1,91 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar  2 15:29:12 2020
+
+@author: ysxh1998
+"""
+
+
+
+import os
+from keras import layers
+from keras import models
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+import numpy as np
+from keras import optimizers
+from keras import regularizers
+
+base_dir = 'E:/mnist_data/mnist_png'
+train_dir = os.path.join(base_dir, 'training')
+test_dir = os.path.join(base_dir, 'testing')
+
+
+
+
+
+#print(label)
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu',
+                        input_shape=(28, 28,1)))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.Flatten())
+model.add(layers.Dense(64, kernel_regularizer=regularizers.l2(0.01),activation='relu'))
+model.add(layers.Dense(10, activation='softmax'))
+
+model.compile(loss='categorical_crossentropy',
+              optimizer=optimizers.Adam(lr=1e-4),
+              metrics=['acc'])
+
+
+
+#print(test.shape)
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+   )
+test_datagen = ImageDataGenerator(rescale=1./255)
+    
+train_generator = train_datagen.flow_from_directory(
+        # This is the target directory
+        train_dir,
+        # All images will be resized to 150x150
+        target_size=(28,28),
+        color_mode='grayscale',
+        batch_size=20,
+        # Since we use binary_crossentropy loss, we need binary labels
+        class_mode='categorical')
+
+test_generator = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=(28,28),
+        color_mode='grayscale',
+        batch_size=20,
+        class_mode='categorical')
+    
+history = model.fit_generator(train_generator,steps_per_epoch=100,epochs=30,validation_data=test_generator,validation_steps=50)  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
