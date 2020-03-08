@@ -1,0 +1,79 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 14 14:42:57 2020
+
+@author: ysxh1998
+"""
+
+import keras
+import pandas as pd
+import numpy as np
+from keras import models
+from keras import layers
+from keras import optimizers
+import matplotlib.pyplot as plt
+from keras import regularizers
+
+
+data = pd.read_csv("E:/python/DNN/drug_table_mortality_with_no.csv")
+data_label = pd.read_csv("E:/python/DNN/mortality_table.csv")
+
+data = data.values.tolist()
+data_label = data_label.values.tolist()
+
+
+x_train = data[0:25001]
+x_train = [i[1:] for i in x_train]
+x_test = data[25001:30001]
+x_test = [i[1:] for i in x_test]
+y_train = data_label[0:25001]
+y_train = [i[1] for i in y_train]
+y_test = data_label[25001:30001]
+y_test = [i[1] for i in y_test]
+
+x_train = np.asarray(x_train).astype('float32')
+x_test = np.asarray(x_test).astype('float32')
+y_train = np.asarray(y_train).astype('float32')
+y_test = np.asarray(y_test).astype('float32')
+
+model = models.Sequential()
+model.add(layers.Dense(512, kernel_regularizer=regularizers.l2(0.01),activation='relu', input_shape=(2913,)))
+model.add(layers.Dropout(0.5))
+model.add(layers.Dense(256, kernel_regularizer=regularizers.l2(0.01),activation='relu'))
+model.add(layers.Dropout(0.5))
+model.add(layers.Dense(128, kernel_regularizer=regularizers.l2(0.01),activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
+
+model.compile(optimizer=optimizers.RMSprop(lr=0.0003),
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+x_val = x_train[:5000]
+partial_x_train = x_train[5000:]
+
+y_val = y_train[:5000]
+partial_y_train = y_train[5000:]
+
+history = model.fit(partial_x_train,
+                    partial_y_train,
+                    epochs=50,
+                    batch_size=512,
+                    validation_data=(x_val, y_val))
+
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+results = model.evaluate(x_test, y_test)
+
+
+
+
+
+
+
+
+
+
+
